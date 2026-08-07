@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Proyecto616 - Estado DB</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            max-width: 90%;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .status {
+            font-size: 1.8rem;
+            margin: 1.5rem 0;
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Proyecto 616</h1>
+        <div class="status" id="status-message">Verificando conexión...</div>
+    </div>
+    <script>
+        fetch('/api/status')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('status-message').textContent = data.message;
+            })
+            .catch(err => {
+                document.getElementById('status-message').textContent = 'Error al conectar con el servidor';
+            });
+    </script>
+</body>
+</html>
