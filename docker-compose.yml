@@ -1,16 +1,17 @@
 services:
   db:
-    image: postgres:16-alpine   # Versión fija, evita error de pg18+
+    image: mysql:8
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - pgdata_new:/var/lib/postgresql/data   # Nombre de volumen nuevo
+      - mysql_data:/var/lib/mysql
     networks:
       - app-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -19,9 +20,9 @@ services:
     image: vln14777/backend:latest
     environment:
       DB_HOST: db
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
     networks:
       - app-net
     depends_on:
@@ -32,25 +33,27 @@ services:
       interval: 15s
       timeout: 5s
       retries: 3
+    # No exponemos puertos al host; NPM hará proxy interno
 
-  frontend:
-    image: vln14777/frontend:latest
+  npm:
+    image: jc21/nginx-proxy-manager:latest
     ports:
       - "80:80"
+      - "443:443"
+      - "81:81"
+    volumes:
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
     networks:
       - app-net
     depends_on:
-      backend:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
+      - backend
 
 networks:
   app-net:
     driver: bridge
 
 volumes:
-  pgdata_new:   # Declaración del nuevo volumen
+  mysql_data:
+  npm_data:
+  npm_letsencrypt:
