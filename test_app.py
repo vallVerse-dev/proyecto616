@@ -25,7 +25,4 @@ class TestAPI(unittest.TestCase):
         data = response.get_json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Conexión exitosa', data['message'])
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertIn('Mensaje equivocado', data['message'])  # Esto fallará
