@@ -22,7 +22,7 @@ def status():
         with conn.cursor() as cur:
             cur.execute('SELECT 1')
         conn.close()
-        return jsonify({"message": "Conexión exitosa a la base de datos"})
+        return jsonify({"message": "Bienvenido a Proyecto616 - Conexión exitosa a la base de datos"})
     except Exception as e:
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
