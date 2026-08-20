@@ -1,12 +1,32 @@
-name: Publicar imagen Docker Hub
+name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
-  build-and-push:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install pytest
+
+      - name: Ejecutar pruebas
+        run: pytest test_app.py
+
+  build-and-deploy:
+    needs: test   # Solo se ejecuta si 'test' termina exitosamente
     runs-on: ubuntu-latest
     steps:
       - name: Descargar código
@@ -25,9 +45,13 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest
 
-      - name: Construir y subir imagen del frontend
-        uses: docker/build-push-action@v4
+      - name: Desplegar en el servidor
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          context: ./frontend
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd ~/proyecto616
+            docker compose pull backend
+            docker compose up -d --force-recreate backend
