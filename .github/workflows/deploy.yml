@@ -1,4 +1,4 @@
- name: CI/CD Pipeline con Seguridad
+name: CI/CD Pipeline con Seguridad
 
 on:
   push:
