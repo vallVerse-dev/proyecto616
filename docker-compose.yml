@@ -19,6 +19,7 @@ services:
   backend:
     image: vln14777/backend:latest
     environment:
+      HOST: 0.0.0.0
       DB_HOST: db
       DB_NAME: ${MYSQL_DATABASE}
       DB_USER: ${MYSQL_USER}
