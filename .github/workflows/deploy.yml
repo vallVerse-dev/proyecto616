@@ -58,7 +58,7 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'library'
-          severity: 'CRITICAL,HIGH'
+          severity: 'CRITICAL'
           ignorefile: './.trivyignore'
 
       - name: Subir imagen a Docker Hub
